@@ -1,7 +1,7 @@
 sources:
   - name: price
     database: raw
-    schema: equity_dashboard
+    schema: equity_dashboard_yfinance
     tables:
       - name: raw_dim_security
         description: >
@@ -19,7 +19,7 @@ sources:
         description: >
           This table contains snapshots of equity security data over time. It includes metrics 
           such as market capitalization, volume, and various performance ratios (like P/E and forward P/E).
-      - name:
+      - name: raw_fact_price_targets
         description: >
           This table contains data on price targets for various stocks as reported by analysts. 
           It includes the current price, predicted high, low, mean, and median targets.
