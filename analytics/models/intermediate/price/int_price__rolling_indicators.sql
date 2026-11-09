@@ -1,10 +1,18 @@
-WITH calculation AS(
+WITH price_daily AS(
+  SELECT
+    *
+  FROM
+    {{ ref('stg_price__price_daily') }}
+),
+
+calculation AS(
   SELECT
     ticker,
     date,
     close,
     adj_close,
     volume,
+    ingested_at,
 
     -- daily_change_pct
     (close - LAG(close) OVER(
@@ -51,35 +59,32 @@ WITH calculation AS(
       ROWS BETWEEN 251 PRECEDING AND CURRENT ROW
     ) AS low_52w
   FROM
-    {{ ref('stg_price__price_daily') }}
-),
-
-cleaned AS(
-  SELECT
-    ticker,
-    date,
-    close,
-    adj_close,
-    volume,
-    daily_change_pct,
-    sma_50,
-    sma_100,
-    sma_200,
-    {{ dbt_utils.safe_divide('close - sma_200', 'sma_200') }} * 100 AS pct_from_sma_200,
-    CASE
-      WHEN close >= sma_200 THEN TRUE
-      ELSE FALSE
-    END AS above_sma_200,
-    avg_vol_50,
-    {{ dbt_utils.safe_divide('volume', 'avg_vol_50') }} AS rel_vol,
-    high_52w,
-    low_52w,
-    {{ dbt_utils.safe_divide('close - low_52w', 'high_52w - low_52w') }} AS range_position_52w
-  FROM
-    calculation
-  ORDER BY
-    ticker,
-    date DESC
+    price_daily
 )
 
-SELECT * FROM cleaned
+SELECT
+  ticker,
+  date,
+  close,
+  adj_close,
+  volume,
+  daily_change_pct,
+  sma_50,
+  sma_100,
+  sma_200,
+  {{ dbt_utils.safe_divide('close - sma_200', 'sma_200') }} * 100 AS pct_from_sma_200,
+  CASE
+    WHEN close >= sma_200 THEN TRUE
+    ELSE FALSE
+  END AS above_sma_200,
+  avg_vol_50,
+  {{ dbt_utils.safe_divide('volume', 'avg_vol_50') }} AS rel_vol,
+  high_52w,
+  low_52w,
+  {{ dbt_utils.safe_divide('close - low_52w', 'high_52w - low_52w') }} AS range_position_52w,
+  ingested_at AS data_updated_at
+FROM
+  calculation
+ORDER BY
+  ticker,
+  date DESC

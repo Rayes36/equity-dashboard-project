@@ -1,16 +1,26 @@
-WITH extract_week_start AS(
+WITH price_daily AS(
   SELECT
-    pd.ticker,
-    pd.date,
-    pd.close,
-    d.week_start
+    *
   FROM
-    {{ ref('stg_price__price_daily') }} AS pd
-  LEFT JOIN {{ ref('stg_price__date') }} AS d
-    ON d.date = pd.date
-  ORDER BY
-    ticker,
-    date
+    {{ ref('stg_price__price_daily') }}
+),
+
+price_date AS(
+  SELECT
+    *
+  FROM
+    {{ ref('stg_price__date') }}
 )
 
-SELECT * FROM extract_week_start
+SELECT
+  pd.ticker,
+  pd.date,
+  pd.close,
+  d.week_start
+FROM
+  price_daily AS pd
+LEFT JOIN price_date AS d
+  ON d.date = pd.date
+ORDER BY
+  ticker,
+  date

@@ -46,6 +46,8 @@ models:
         description: "Lowest close over the last 252 trading days."
       - name: range_position_52w
         description: "Where close sits between the 52-week low (0) and high (1)."
+      - name: data_updated_at
+        description: "UTC time the extract run loaded the data."
 
   - name: int_price__technical_indicators_daily
     description: >
@@ -169,6 +171,10 @@ models:
         description: "Average daily volume over the last 50 trading days."
       - name: macd_hist
         description: "MACD line minus the signal line."
+      - name: data_updated_at
+        description: "UTC time the extract run loaded the data."
+        data_tests:
+          - not_null
 
   - name: int_price__extract_week
     description: "Daily closes tagged with the Monday of their week, used for the weekly averages."
@@ -214,10 +220,6 @@ models:
         description: "Market the security trades in."
       - name: currency
         description: "Currency the security is quoted in."
-      - name: data_updated_at
-        description: "UTC time the extract run loaded the data."
-        data_tests:
-          - not_null
       - name: market_cap
         description: "Total market value of the company."
       - name: avg_volume
@@ -238,11 +240,18 @@ models:
         description: "Forecast earnings per share. Can be below trailing EPS."
       - name: peg_ratio
         description: "P/E ratio divided by expected earnings growth."
+      - name: data_updated_at
+        description: "UTC time the extract run loaded the data."
+        data_tests:
+          - not_null
 
-  - name: int_price__security_snapshot
+  - name: int_price__technical_indicator_snapshot
     description: >
       "One row per ticker combining the latest indicators, the 200-week averages, 
       security details, and snapshot metrics. Feeds the latest price mart."
+    config:
+      materialized: table
+      tags: ['python']
     columns:
       - name: ticker
         description: "Stock ticker symbol."
@@ -253,20 +262,6 @@ models:
         description: "Date of the latest close in this row."
         data_tests:
           - not_null
-      - name: company_name
-        description: "Short company name."
-      - name: exchange
-        description: "Exchange the stock is listed on."
-      - name: type
-        description: "Security type, for example equity."
-      - name: sector
-        description: "Business sector."
-      - name: industry
-        description: "Industry within the sector."
-      - name: market
-        description: "Market the security trades in."
-      - name: currency
-        description: "Currency the security is quoted in."
       - name: close
         description: "Latest closing price."
       - name: prev_close
@@ -296,12 +291,6 @@ models:
         description: "Exponential moving average of close over 200 days."
       - name: pct_from_sma_200
         description: "Percent distance of close from the 200-day SMA."
-      - name: sma_200w
-        description: "Average of the last 200 weekly closes."
-      - name: ema_200w
-        description: "Exponential moving average of weekly closes over 200 weeks."
-      - name: pct_from_sma_200w
-        description: "Percent distance of close from the 200-week SMA."
       - name: rsi_14
         description: "14-day relative strength index from 0 to 100."
         data_tests:
@@ -315,27 +304,13 @@ models:
         description: "Average daily volume over the last 50 trading days."
       - name: macd_hist
         description: "MACD line minus the signal line."
-      - name: market_cap
-        description: "Total market value of the company."
-      - name: avg_volume
-        description: "Average daily trading volume reported by Yahoo."
-      - name: shares_outstanding
-        description: "Shares outstanding. Counts one share class only for GOOGL and META, so use market_cap instead."
-      - name: dividend_yield
-        description: "Annual dividend as a percentage of price (0.26 means 0.26%)."
-      - name: beta
-        description: "How much the stock moves relative to the market."
-      - name: pe
-        description: "Trailing price-to-earnings ratio."
-      - name: forward_pe
-        description: "Price-to-earnings ratio using forecast earnings."
-      - name: eps
-        description: "Trailing earnings per share."
-      - name: forward_eps
-        description: "Forecast earnings per share. Can be below trailing EPS."
-      - name: peg_ratio
-        description: "P/E ratio divided by expected earnings growth."
       - name: data_updated_at
         description: "UTC time the extract run loaded the data."
         data_tests:
           - not_null
+      - name: sma_200w
+        description: "Average of the last 200 weekly closes."
+      - name: ema_200w
+        description: "Exponential moving average of weekly closes over 200 weeks."
+      - name: pct_from_sma_200w
+        description: "Percent distance of close from the 200-week SMA."

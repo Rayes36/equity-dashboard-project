@@ -1,0 +1,14 @@
+models:
+  - name: mart_price_daily
+    description: >
+      # TODO
+    columns:
+      - name: ticker
+        description: # TODO
+
+  - name: mart_security_snapshot
+    description: >
+      # TODO
+    columns:
+      - name: ticker
+        description: # TODO

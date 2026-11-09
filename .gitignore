@@ -10,4 +10,9 @@ wheels/
 .venv
 .vscode
 
+# logs
 logs/
+
+# files
+*.parquet
+*.csv
