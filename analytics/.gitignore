@@ -4,4 +4,4 @@ dbt_internal_packages/
 logs/
 .env
 *.parquet
-*.csv
+!analytics/seeds/*.csv

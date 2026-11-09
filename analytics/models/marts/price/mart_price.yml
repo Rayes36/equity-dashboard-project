@@ -1,14 +1,196 @@
 models:
   - name: mart_price_daily
-    description: >
-      # TODO
+    description: "Daily price, indicators, and volume per ticker for the last 10 years. One row per ticker per trading day. Feeds the price, volume, RSI, and MACD charts."
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [ticker, date]
     columns:
       - name: ticker
-        description: # TODO
+        description: "Stock ticker symbol."
+        data_tests:
+          - not_null
+      - name: date
+        description: "Trading date."
+        data_tests:
+          - not_null
+      - name: close
+        description: "Closing price, adjusted for splits but not dividends."
+        data_tests:
+          - not_null
+      - name: adj_close
+        description: "Closing price adjusted for splits and dividends."
+      - name: daily_change_pct
+        description: "Percent change in close versus the previous trading day (8.2 means 8.2%)."
+      - name: high_52w
+        description: "Highest close over the last 252 trading days."
+      - name: low_52w
+        description: "Lowest close over the last 252 trading days."
+      - name: range_position_52w
+        description: "Where close sits between the 52-week low (0) and high (1)."
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 1
+      - name: sma_50
+        description: "Average close over the last 50 trading days."
+      - name: sma_100
+        description: "Average close over the last 100 trading days."
+      - name: sma_200
+        description: "Average close over the last 200 trading days."
+      - name: pct_from_sma_200
+        description: "Percent distance of close from the 200-day SMA."
+      - name: above_sma_200
+        description: "True when close is at or above the 200-day SMA."
+      - name: ema_50
+        description: "Exponential moving average of close over 50 days."
+      - name: ema_100
+        description: "Exponential moving average of close over 100 days."
+      - name: ema_200
+        description: "Exponential moving average of close over 200 days."
+      - name: rsi_14
+        description: "14-day relative strength index from 0 to 100."
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 100
+      - name: macd
+        description: "MACD line, the 12-day EMA minus the 26-day EMA of close."
+      - name: macd_signal
+        description: "Signal line, a 9-day EMA of the MACD line."
+      - name: macd_hist
+        description: "MACD histogram, the MACD line minus the signal line."
+      - name: volume
+        description: "Number of shares traded."
+      - name: avg_vol_50
+        description: "Average daily volume over the last 50 trading days."
+      - name: rel_vol
+        description: "Volume divided by the 50-day average volume."
 
   - name: mart_security_snapshot
-    description: >
-      # TODO
+    description: "One row per ticker with the latest close and indicators, the 200-week averages, security details, valuation metrics, and analyst price targets. Feeds the dashboard cards."
+    data_tests:
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "target_low <= target_median and target_median <= target_high"
     columns:
       - name: ticker
-        description: # TODO
+        description: "Stock ticker symbol."
+        data_tests:
+          - not_null
+          - unique
+      - name: company_name
+        description: "Short company name."
+      - name: exchange
+        description: "Exchange the stock is listed on."
+      - name: type
+        description: "Security type, for example equity."
+      - name: sector
+        description: "Business sector."
+      - name: industry
+        description: "Industry within the sector."
+      - name: market
+        description: "Market the security trades in."
+      - name: currency
+        description: "Currency the security is quoted in."
+      - name: market_cap
+        description: "Total market value of the company."
+      - name: shares_outstanding
+        description: "Shares outstanding. Counts one share class only for GOOGL and META, so use market_cap instead."
+      - name: dividend_yield
+        description: "Annual dividend as a percentage of price (0.26 means 0.26%)."
+      - name: beta
+        description: "How much the stock moves relative to the market."
+      - name: pe
+        description: "Trailing price-to-earnings ratio."
+      - name: forward_pe
+        description: "Price-to-earnings ratio using forecast earnings."
+      - name: eps
+        description: "Trailing earnings per share."
+      - name: forward_eps
+        description: "Forecast earnings per share. Can be below trailing EPS."
+      - name: peg_ratio
+        description: "P/E ratio divided by expected earnings growth."
+      - name: as_of_date
+        description: "Date of the latest close in this row."
+        data_tests:
+          - not_null
+      - name: close
+        description: "Latest closing price."
+        data_tests:
+          - not_null
+      - name: prev_close
+        description: "Close of the previous trading day."
+      - name: change
+        description: "Dollar change versus the previous close."
+      - name: change_pct
+        description: "Percent change versus the previous close (8.2 means 8.2%)."
+      - name: high_52w
+        description: "Highest close over the last 252 trading days."
+      - name: low_52w
+        description: "Lowest close over the last 252 trading days."
+      - name: range_position_52w
+        description: "Where close sits between the 52-week low (0) and high (1)."
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 1
+      - name: sma_50
+        description: "Average close over the last 50 trading days."
+      - name: sma_100
+        description: "Average close over the last 100 trading days."
+      - name: sma_200
+        description: "Average close over the last 200 trading days."
+      - name: pct_from_sma_200
+        description: "Percent distance of close from the 200-day SMA."
+      - name: sma_200w
+        description: "Average of the last 200 weekly closes."
+      - name: pct_from_sma_200w
+        description: "Percent distance of close from the 200-week SMA."
+      - name: ema_50
+        description: "Exponential moving average of close over 50 days."
+      - name: ema_100
+        description: "Exponential moving average of close over 100 days."
+      - name: ema_200
+        description: "Exponential moving average of close over 200 days."
+      - name: ema_200w
+        description: "Exponential moving average of weekly closes over 200 weeks."
+      - name: rsi_14
+        description: "14-day relative strength index from 0 to 100."
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 100
+      - name: avg_vol_50
+        description: "Average daily volume over the last 50 trading days."
+      - name: rel_vol
+        description: "Volume divided by the 50-day average volume."
+      - name: macd_hist
+        description: "MACD line minus the signal line."
+      - name: data_updated_at
+        description: "UTC time the extract run loaded the data."
+        data_tests:
+          - not_null
+      - name: target_high
+        description: "Highest analyst price target, in the stock's currency."
+      - name: target_low
+        description: "Lowest analyst price target."
+      - name: target_mean
+        description: "Average analyst price target."
+      - name: target_median
+        description: "Median analyst price target."
+      - name: analyst_rating
+        description: "Consensus rating label, for example strong buy."
+      - name: analyst_rating_mean
+        description: "Average analyst rating from 1 (strong buy) to 5 (sell)."
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 1
+                max_value: 5
+      - name: analyst_count
+        description: "Number of analysts behind the targets and rating."

@@ -10,6 +10,13 @@ technical_indicator_snapshot AS(
     *
   FROM
     {{ ref('int_price__technical_indicator_snapshot') }}
+),
+
+price_target AS(
+  SELECT
+    *
+  FROM
+    {{ ref('stg_price__price_targets') }}
 )
 
 SELECT
@@ -39,19 +46,30 @@ SELECT
   ti.low_52w,
   ti.range_position_52w,
   ti.sma_50,
+  ti.sma_100,
   ti.sma_200,
   ti.pct_from_sma_200,
   ti.sma_200w,
   ti.pct_from_sma_200w,
   ti.ema_50,
+  ti.ema_100,
   ti.ema_200,
   ti.ema_200w,
   ti.rsi_14,
   ti.avg_vol_50,
   ti.rel_vol,
   ti.macd_hist,
-  ti.data_updated_at
+  ti.data_updated_at,
+  pt.target_high,
+  pt.target_low,
+  pt.target_mean,
+  pt.target_median,
+  pt.analyst_rating,
+  pt.analyst_rating_mean,
+  pt.analyst_count
 FROM
   security_snapshot AS s
 LEFT JOIN technical_indicator_snapshot AS ti
   ON s.ticker = ti.ticker
+LEFT JOIN price_target AS pt
+  ON s.ticker = pt.ticker
