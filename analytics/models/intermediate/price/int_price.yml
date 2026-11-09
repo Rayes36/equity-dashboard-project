@@ -155,10 +155,14 @@ models:
         description: "Where close sits between the 52-week low (0) and high (1)."
       - name: sma_50
         description: "Average close over the last 50 trading days."
+      - name: sma_100
+        description: "Average close over the last 100 trading days."
       - name: sma_200
         description: "Average close over the last 200 trading days."
       - name: ema_50
         description: "Exponential moving average of close over 50 days."
+      - name: ema_100
+        description: "Exponential moving average of close over 100 days."
       - name: ema_200
         description: "Exponential moving average of close over 200 days."
       - name: pct_from_sma_200
@@ -283,10 +287,14 @@ models:
                 max_value: 1
       - name: sma_50
         description: "Average close over the last 50 trading days."
+      - name: sma_100
+        description: "Average close over the last 100 trading days."
       - name: sma_200
         description: "Average close over the last 200 trading days."
       - name: ema_50
         description: "Exponential moving average of close over 50 days."
+      - name: ema_100
+        description: "Exponential moving average of close over 100 days."
       - name: ema_200
         description: "Exponential moving average of close over 200 days."
       - name: pct_from_sma_200
