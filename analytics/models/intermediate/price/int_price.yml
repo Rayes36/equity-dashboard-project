@@ -1,0 +1,341 @@
+models:
+  - name: int_price__rolling_indicators
+    description: >
+      "Daily SQL indicators per ticker (changes, SMAs, volume average, 52-week range) on 
+      the full 11 years. The first rows of each window are partial averages."
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [ticker, date]
+    columns:
+      - name: ticker
+        description: "Stock ticker symbol."
+        data_tests:
+          - not_null
+      - name: date
+        description: "Trading date."
+        data_tests:
+          - not_null
+      - name: close
+        description: "Closing price, adjusted for splits but not dividends."
+        data_tests:
+          - not_null
+      - name: adj_close
+        description: "Closing price adjusted for splits and dividends."
+      - name: volume
+        description: "Number of shares traded."
+      - name: daily_change_pct
+        description: "Percent change in close versus the previous trading day."
+      - name: sma_50
+        description: "Average close over the last 50 trading days."
+      - name: sma_100
+        description: "Average close over the last 100 trading days."
+      - name: sma_200
+        description: "Average close over the last 200 trading days."
+      - name: pct_from_sma_200
+        description: "Percent distance of close from the 200-day SMA."
+      - name: above_sma_200
+        description: "True when close is at or above the 200-day SMA."
+      - name: avg_vol_50
+        description: "Average daily volume over the last 50 trading days."
+      - name: rel_vol
+        description: "Volume divided by the 50-day average volume."
+      - name: high_52w
+        description: "Highest close over the last 252 trading days."
+      - name: low_52w
+        description: "Lowest close over the last 252 trading days."
+      - name: range_position_52w
+        description: "Where close sits between the 52-week low (0) and high (1)."
+
+  - name: int_price__technical_indicators_daily
+    description: >
+      "Daily indicators per ticker, adding EMA, RSI, and MACD in Python. 
+      Trimmed to the last 10 years, since the extra year is only used for warm-up."
+    config:
+      materialized: table
+      tags: ['python']
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [ticker, date]
+    columns:
+      - name: ticker
+        description: "Stock ticker symbol."
+        data_tests:
+          - not_null
+      - name: date
+        description: "Trading date."
+        data_tests:
+          - not_null
+      - name: close
+        description: "Closing price, adjusted for splits but not dividends."
+        data_tests:
+          - not_null
+      - name: adj_close
+        description: "Closing price adjusted for splits and dividends."
+      - name: volume
+        description: "Number of shares traded."
+      - name: daily_change_pct
+        description: "Percent change in close versus the previous trading day."
+      - name: sma_50
+        description: "Average close over the last 50 trading days."
+      - name: sma_100
+        description: "Average close over the last 100 trading days."
+      - name: sma_200
+        description: "Average close over the last 200 trading days."
+      - name: pct_from_sma_200
+        description: "Percent distance of close from the 200-day SMA."
+      - name: above_sma_200
+        description: "True when close is at or above the 200-day SMA."
+      - name: avg_vol_50
+        description: "Average daily volume over the last 50 trading days."
+      - name: rel_vol
+        description: "Volume divided by the 50-day average volume."
+      - name: high_52w
+        description: "Highest close over the last 252 trading days."
+      - name: low_52w
+        description: "Lowest close over the last 252 trading days."
+      - name: range_position_52w
+        description: "Where close sits between the 52-week low (0) and high (1)."
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 1
+      - name: ema_50
+        description: "Exponential moving average of close over 50 days."
+      - name: ema_100
+        description: "Exponential moving average of close over 100 days."
+      - name: ema_200
+        description: "Exponential moving average of close over 200 days."
+      - name: rsi_14
+        description: "14-day relative strength index from 0 to 100. Empty for the first rows."
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 100
+      - name: macd
+        description: "MACD line, the 12-day EMA minus the 26-day EMA of close."
+      - name: macd_signal
+        description: "Signal line, a 9-day EMA of the MACD line."
+      - name: macd_hist
+        description: "MACD histogram, the MACD line minus the signal line."
+
+# --------------------------------------------------------------------------------------------------
+
+  - name: int_price__extract_latest_technical_indicator
+    description: >
+      "Newest trading day per ticker from the daily indicators, with previous close and daily change."
+    columns:
+      - name: ticker
+        description: "Stock ticker symbol."
+        data_tests:
+          - not_null
+          - unique
+      - name: date
+        description: "Date of the latest close."
+        data_tests:
+          - not_null
+      - name: close
+        description: "Latest closing price."
+      - name: prev_close
+        description: "Close of the previous trading day."
+      - name: change
+        description: "Dollar change versus the previous close."
+      - name: change_pct
+        description: "Percent change versus the previous close."
+      - name: high_52w
+        description: "Highest close over the last 252 trading days."
+      - name: low_52w
+        description: "Lowest close over the last 252 trading days."
+      - name: range_position_52w
+        description: "Where close sits between the 52-week low (0) and high (1)."
+      - name: sma_50
+        description: "Average close over the last 50 trading days."
+      - name: sma_200
+        description: "Average close over the last 200 trading days."
+      - name: ema_50
+        description: "Exponential moving average of close over 50 days."
+      - name: ema_200
+        description: "Exponential moving average of close over 200 days."
+      - name: pct_from_sma_200
+        description: "Percent distance of close from the 200-day SMA."
+      - name: rsi_14
+        description: "14-day relative strength index from 0 to 100."
+      - name: rel_vol
+        description: "Volume divided by the 50-day average volume."
+      - name: avg_vol_50
+        description: "Average daily volume over the last 50 trading days."
+      - name: macd_hist
+        description: "MACD line minus the signal line."
+
+  - name: int_price__extract_week
+    description: "Daily closes tagged with the Monday of their week, used for the weekly averages."
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [ticker, date]
+    columns:
+      - name: ticker
+        description: "Stock ticker symbol."
+        data_tests:
+          - not_null
+      - name: date
+        description: "Trading date."
+        data_tests:
+          - not_null
+      - name: close
+        description: "Closing price, adjusted for splits but not dividends."
+      - name: week_start
+        description: "Monday of the week the date falls in. Empty if the date is missing from the date table."
+        data_tests:
+          - not_null
+
+  - name: int_price__extract_security_snapshot
+    description: "Security details joined with the latest snapshot metrics, one row per ticker."
+    columns:
+      - name: ticker
+        description: "Stock ticker symbol."
+        data_tests:
+          - not_null
+          - unique
+      - name: company_name
+        description: "Short company name."
+      - name: exchange
+        description: "Exchange the stock is listed on."
+      - name: type
+        description: "Security type, for example equity."
+      - name: sector
+        description: "Business sector."
+      - name: industry
+        description: "Industry within the sector."
+      - name: market
+        description: "Market the security trades in."
+      - name: currency
+        description: "Currency the security is quoted in."
+      - name: data_updated_at
+        description: "UTC time the extract run loaded the data."
+        data_tests:
+          - not_null
+      - name: market_cap
+        description: "Total market value of the company."
+      - name: avg_volume
+        description: "Average daily trading volume reported by Yahoo."
+      - name: shares_outstanding
+        description: "Shares outstanding. Counts one share class only for GOOGL and META, so use market_cap instead."
+      - name: dividend_yield
+        description: "Annual dividend as a percentage of price (0.26 means 0.26%)."
+      - name: beta
+        description: "How much the stock moves relative to the market."
+      - name: pe
+        description: "Trailing price-to-earnings ratio."
+      - name: forward_pe
+        description: "Price-to-earnings ratio using forecast earnings."
+      - name: eps
+        description: "Trailing earnings per share."
+      - name: forward_eps
+        description: "Forecast earnings per share. Can be below trailing EPS."
+      - name: peg_ratio
+        description: "P/E ratio divided by expected earnings growth."
+
+  - name: int_price__security_snapshot
+    description: >
+      "One row per ticker combining the latest indicators, the 200-week averages, 
+      security details, and snapshot metrics. Feeds the latest price mart."
+    columns:
+      - name: ticker
+        description: "Stock ticker symbol."
+        data_tests:
+          - not_null
+          - unique
+      - name: as_of_date
+        description: "Date of the latest close in this row."
+        data_tests:
+          - not_null
+      - name: company_name
+        description: "Short company name."
+      - name: exchange
+        description: "Exchange the stock is listed on."
+      - name: type
+        description: "Security type, for example equity."
+      - name: sector
+        description: "Business sector."
+      - name: industry
+        description: "Industry within the sector."
+      - name: market
+        description: "Market the security trades in."
+      - name: currency
+        description: "Currency the security is quoted in."
+      - name: close
+        description: "Latest closing price."
+      - name: prev_close
+        description: "Close of the previous trading day."
+      - name: change
+        description: "Dollar change versus the previous close."
+      - name: change_pct
+        description: "Percent change versus the previous close."
+      - name: high_52w
+        description: "Highest close over the last 252 trading days."
+      - name: low_52w
+        description: "Lowest close over the last 252 trading days."
+      - name: range_position_52w
+        description: "Where close sits between the 52-week low (0) and high (1)."
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 1
+      - name: sma_50
+        description: "Average close over the last 50 trading days."
+      - name: sma_200
+        description: "Average close over the last 200 trading days."
+      - name: ema_50
+        description: "Exponential moving average of close over 50 days."
+      - name: ema_200
+        description: "Exponential moving average of close over 200 days."
+      - name: pct_from_sma_200
+        description: "Percent distance of close from the 200-day SMA."
+      - name: sma_200w
+        description: "Average of the last 200 weekly closes."
+      - name: ema_200w
+        description: "Exponential moving average of weekly closes over 200 weeks."
+      - name: pct_from_sma_200w
+        description: "Percent distance of close from the 200-week SMA."
+      - name: rsi_14
+        description: "14-day relative strength index from 0 to 100."
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 100
+      - name: rel_vol
+        description: "Volume divided by the 50-day average volume."
+      - name: avg_vol_50
+        description: "Average daily volume over the last 50 trading days."
+      - name: macd_hist
+        description: "MACD line minus the signal line."
+      - name: market_cap
+        description: "Total market value of the company."
+      - name: avg_volume
+        description: "Average daily trading volume reported by Yahoo."
+      - name: shares_outstanding
+        description: "Shares outstanding. Counts one share class only for GOOGL and META, so use market_cap instead."
+      - name: dividend_yield
+        description: "Annual dividend as a percentage of price (0.26 means 0.26%)."
+      - name: beta
+        description: "How much the stock moves relative to the market."
+      - name: pe
+        description: "Trailing price-to-earnings ratio."
+      - name: forward_pe
+        description: "Price-to-earnings ratio using forecast earnings."
+      - name: eps
+        description: "Trailing earnings per share."
+      - name: forward_eps
+        description: "Forecast earnings per share. Can be below trailing EPS."
+      - name: peg_ratio
+        description: "P/E ratio divided by expected earnings growth."
+      - name: data_updated_at
+        description: "UTC time the extract run loaded the data."
+        data_tests:
+          - not_null

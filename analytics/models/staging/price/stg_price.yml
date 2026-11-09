@@ -1,5 +1,5 @@
 models:
-  - name: stg_price__security
+  - name: stg_price__security_info
     description: "One row per ticker with company details from Yahoo Finance."
     columns:
       - name: ticker
