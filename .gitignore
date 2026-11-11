@@ -16,3 +16,4 @@ logs/
 # files
 *.parquet
 *.csv
+other/

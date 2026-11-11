@@ -18,6 +18,9 @@ cleaned AS(
     stock_splits,
     ingested_at
   FROM source
+  WHERE
+    NOT (close IS NULL 
+      AND date >= date_sub(current_date(), 3))
 )
 
 SELECT * FROM cleaned
