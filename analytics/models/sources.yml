@@ -23,3 +23,26 @@ sources:
         description: >
           This table contains data on price targets for various stocks as reported by analysts. 
           It includes the current price, predicted high, low, mean, and median targets.
+
+  - name: financial
+    database: raw
+    schema: equity_dashboard_edgar
+    tables:
+      - name: raw_balance_sheets_quarterly
+        description: >
+          TODO
+      - name: raw_balance_sheets_yearly
+        description: >
+          TODO
+      - name: raw_cash_flows_quarterly
+        description: >
+          TODO
+      - name: raw_cash_flows_yearly
+        description: >
+          TODO
+      - name: raw_income_statements_quarterly
+        description: >
+          TODO
+      - name: raw_income_statements_yearly
+        description: >
+          TODO

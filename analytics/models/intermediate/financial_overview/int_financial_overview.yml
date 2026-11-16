@@ -1,0 +1,116 @@
+models:
+  - name: int_financial_overview__quarterly
+    description: # TODO
+    columns:
+      - name: ticker
+        description: "Stock ticker symbol."
+        data_tests:
+          - not_null
+      - name: label
+        description: "Display name of the line item, for example Total Revenue."
+        data_tests:
+          - not_null
+      - name: period
+        description: "Fiscal quarter label, for example Q2 2026. It follows the company's own fiscal calendar."
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "RLIKE '^Q[1-4] [0-9]{4}$'"
+      - name: quarter
+        description: "Extracted quarter from the period column."
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "RLIKE '^[0-4]{1}$'"
+      - name: year
+        description: "Extracted year from the period column."
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "RLIKE '^[0-9]{4}$'"
+      - name: value
+        description: "Reported amount for the line item. Per-share and share count rows are in their own units, not dollars."
+        data_tests:
+          - not_null
+      - name: data_updated_at
+        description: "UTC time the extract run loaded the data."
+        data_tests:
+          - not_null
+
+  - name: int_financial_overview__ttm
+    description: # TODO
+    columns:
+      - name: ticker
+        description: "Stock ticker symbol."
+        data_tests:
+          - not_null
+      - name: label
+        description: "Display name of the line item, for example Total Revenue."
+        data_tests:
+          - not_null
+      - name: period
+        description: "Fiscal quarter label, for example Q2 2026. It follows the company's own fiscal calendar."
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "RLIKE '^Q[1-4] [0-9]{4}$'"
+      - name: quarter
+        description: "Extracted quarter from the period column."
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "RLIKE '^[0-4]{1}$'"
+      - name: year
+        description: "Extracted year from the period column."
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "RLIKE '^[0-9]{4}$'"
+      - name: value
+        description: "Reported amount for the line item. Per-share and share count rows are in their own units, not dollars."
+        data_tests:
+          - not_null
+      - name: data_updated_at
+        description: "UTC time the extract run loaded the data."
+        data_tests:
+          - not_null
+
+  - name: int_financial_overview__yearly
+    description: # TODO
+    columns:
+      - name: ticker
+        description: "Stock ticker symbol."
+        data_tests:
+          - not_null
+      - name: label
+        description: "Display name of the line item, for example Total Revenue."
+        data_tests:
+          - not_null
+      - name: period
+        description: "Fiscal year label, for example FY 2026. It follows the company's own fiscal calendar."
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "RLIKE '^FY [0-9]{4}$'"
+      - name: year
+        description: "Extracted year from the period column."
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "RLIKE '^[0-9]{4}$'"
+      - name: value
+        description: "Reported amount for the line item. Per-share and share count rows are in their own units, not dollars."
+        data_tests:
+          - not_null
+      - name: data_updated_at
+        description: "UTC time the extract run loaded the data."
+        data_tests:
+          - not_null

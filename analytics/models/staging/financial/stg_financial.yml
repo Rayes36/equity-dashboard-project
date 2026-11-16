@@ -1,0 +1,259 @@
+models:
+  - name: stg_financial__income_statements_quarterly
+    description: >
+      "Quarterly income statement values per ticker, one row per line item per fiscal quarter."
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [ticker, concept, period]
+    columns:
+      - name: ticker
+        description: "Stock ticker symbol."
+        data_tests:
+          - not_null
+      - name: label
+        description: "Display name of the line item, for example Total Revenue."
+        data_tests:
+          - not_null
+      - name: concept
+        description: "XBRL concept name of the line item, for example Revenues."
+        data_tests:
+          - not_null
+      - name: depth
+        description: "Nesting level in the statement. 0 is a main line and 1 is a detail line."
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+      - name: is_total
+        description: "True when the row is a total or subtotal."
+        data_tests:
+          - not_null
+      - name: section
+        description: "Main for headline lines, Additional for detail lines such as gross profit, operating expenses, and R&D."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['Main', 'Additional']
+      - name: period
+        description: "Fiscal quarter label, for example Q2 2026. It follows the company's own fiscal calendar."
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "RLIKE '^Q[1-4] [0-9]{4}$'"
+      - name: quarter
+        description: "Extracted quarter from the period column."
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "RLIKE '^[0-4]{1}$'"
+      - name: year
+        description: "Extracted year from the period column."
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "RLIKE '^[0-9]{4}$'"
+      - name: value
+        description: "Reported amount for the line item. Per-share and share count rows are in their own units, not dollars."
+        data_tests:
+          - not_null
+      - name: data_updated_at
+        description: "UTC time the extract run loaded the data."
+        data_tests:
+          - not_null
+
+  - name: stg_financial__income_statements_yearly
+    description: >
+      "Yearly income statement values per ticker, one row per line item per fiscal year."
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [ticker, concept, period]
+    columns:
+      - name: ticker
+        description: "Stock ticker symbol."
+        data_tests:
+          - not_null
+      - name: label
+        description: "Display name of the line item, for example Total Revenue."
+        data_tests:
+          - not_null
+      - name: concept
+        description: "XBRL concept name of the line item, for example Revenues."
+        data_tests:
+          - not_null
+      - name: depth
+        description: "Nesting level in the statement. 0 is a main line and 1 is a detail line."
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+      - name: is_total
+        description: "True when the row is a total or subtotal."
+        data_tests:
+          - not_null
+      - name: section
+        description: "Main for headline lines, Additional for detail lines such as gross profit, operating expenses, and R&D."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['Main', 'Additional']
+      - name: period
+        description: "Fiscal year label, for example FY 2026. It follows the company's own fiscal calendar."
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "RLIKE '^FY [0-9]{4}$'"
+      - name: year
+        description: "Extracted year from the period column."
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "RLIKE '^[0-9]{4}$'"
+      - name: value
+        description: "Reported amount for the line item. Per-share and share count rows are in their own units, not dollars."
+        data_tests:
+          - not_null
+      - name: data_updated_at
+        description: "UTC time the extract run loaded the data."
+        data_tests:
+          - not_null
+
+# Cash flow ----------------------------------------------------
+  - name: stg_financial__cash_flows_quarterly
+    description: >
+      "Quarterly income statement values per ticker, one row per line item per fiscal quarter."
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [ticker, concept, period]
+    columns:
+      - name: ticker
+        description: "Stock ticker symbol."
+        data_tests:
+          - not_null
+      - name: label
+        description: "Display name of the line item, for example Total Revenue."
+        data_tests:
+          - not_null
+      - name: concept
+        description: "XBRL concept name of the line item, for example Revenues."
+        data_tests:
+          - not_null
+      - name: depth
+        description: "Nesting level in the statement. 0 is a main line and 1 is a detail line."
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+      - name: is_total
+        description: "True when the row is a total or subtotal."
+        data_tests:
+          - not_null
+      - name: section
+        description: "Main for headline lines, Additional for detail lines such as gross profit, operating expenses, and R&D."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['Main', 'Additional']
+      - name: period
+        description: "Fiscal quarter label, for example Q2 2026. It follows the company's own fiscal calendar."
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "RLIKE '^Q[1-4] [0-9]{4}$'"
+      - name: quarter
+        description: "Extracted quarter from the period column."
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "RLIKE '^[0-4]{1}$'"
+      - name: year
+        description: "Extracted year from the period column."
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "RLIKE '^[0-9]{4}$'"
+      - name: value
+        description: "Reported amount for the line item. Per-share and share count rows are in their own units, not dollars."
+        data_tests:
+          - not_null
+      - name: data_updated_at
+        description: "UTC time the extract run loaded the data."
+        data_tests:
+          - not_null
+
+  - name: stg_financial__cash_flows_yearly
+    description: >
+      "Yearly income statement values per ticker, one row per line item per fiscal year."
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [ticker, concept, period]
+    columns:
+      - name: ticker
+        description: "Stock ticker symbol."
+        data_tests:
+          - not_null
+      - name: label
+        description: "Display name of the line item, for example Total Revenue."
+        data_tests:
+          - not_null
+      - name: concept
+        description: "XBRL concept name of the line item, for example Revenues."
+        data_tests:
+          - not_null
+      - name: depth
+        description: "Nesting level in the statement. 0 is a main line and 1 is a detail line."
+        data_tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+      - name: is_total
+        description: "True when the row is a total or subtotal."
+        data_tests:
+          - not_null
+      - name: section
+        description: "Main for headline lines, Additional for detail lines such as gross profit, operating expenses, and R&D."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['Main', 'Additional']
+      - name: period
+        description: "Fiscal year label, for example FY 2026. It follows the company's own fiscal calendar."
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "RLIKE '^FY [0-9]{4}$'"
+      - name: year
+        description: "Extracted year from the period column."
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "RLIKE '^[0-9]{4}$'"
+      - name: value
+        description: "Reported amount for the line item. Per-share and share count rows are in their own units, not dollars."
+        data_tests:
+          - not_null
+      - name: data_updated_at
+        description: "UTC time the extract run loaded the data."
+        data_tests:
+          - not_null
