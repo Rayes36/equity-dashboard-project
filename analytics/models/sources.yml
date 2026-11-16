@@ -30,19 +30,25 @@ sources:
     tables:
       - name: raw_balance_sheets_quarterly
         description: >
-          TODO
+          Quarterly balance sheet line items per ticker from SEC EDGAR, in long format with one row
+          per line item per period. Covers Q1 to Q3 only, because the year-end balance sheet appears in the yearly table.
       - name: raw_balance_sheets_yearly
         description: >
-          TODO
+          Annual balance sheet line items per ticker from SEC EDGAR, in long format.
+          These are the year-end snapshots, so they also stand in for Q4 in the quarterly series.
       - name: raw_cash_flows_quarterly
         description: >
-          TODO
+          Quarterly cash flow statement line items per ticker from SEC EDGAR, in long format
+          with one row per line item per fiscal quarter.
       - name: raw_cash_flows_yearly
         description: >
-          TODO
+          Annual cash flow statement line items per ticker from SEC EDGAR,
+          in long format with one row per line item per fiscal year.
       - name: raw_income_statements_quarterly
         description: >
-          TODO
+          Quarterly income statement line items per ticker from SEC EDGAR, 
+          in long format with one row per line item per fiscal quarter.
       - name: raw_income_statements_yearly
         description: >
-          TODO
+          Annual income statement line items per ticker from SEC EDGAR,
+          in long format with one row per line item per fiscal year.

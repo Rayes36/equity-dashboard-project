@@ -44,7 +44,7 @@ decimal_num_inst AS(
     period,
     quarter,
     year,
-    CAST(value AS FLOAT) AS value,
+    CAST(value AS DOUBLE) AS value,
     data_updated_at
   FROM
     income_statement
@@ -105,11 +105,11 @@ free_cash_flow AS(
       ocf.period,
       ocf.quarter,
       ocf.year,
-      ocf.value - COALESCE(ppe.value, 0) AS value,
-      GREATEST(ocf.data_updated_at, COALESCE(ppe.data_updated_at, ocf.data_updated_at)) AS data_updated_at
+      ocf.value - ppe.value AS value,
+      GREATEST(ocf.data_updated_at, ppe.data_updated_at) AS data_updated_at
     FROM
       operating_cf AS ocf
-    LEFT JOIN ppe
+    INNER JOIN ppe
       ON ppe.ticker = ocf.ticker
     AND ppe.period = ocf.period
 ),

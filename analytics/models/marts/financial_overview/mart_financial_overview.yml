@@ -1,6 +1,10 @@
 models:
   - name: financial_overview_quarterly_fact
-    description: # TODO
+    description: "Quarterly fact table for the financial overview charts. One row per metric per ticker per fiscal quarter."
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [ticker, label, period]
     columns:
       - name: ticker
         description: "Stock ticker symbol."
@@ -23,7 +27,7 @@ models:
           - not_null
           - dbt_utils.expression_is_true:
               arguments:
-                expression: "RLIKE '^[0-4]{1}$'"
+                expression: "RLIKE '^[1-4]{1}$'"
       - name: year
         description: "Extracted year from the period column."
         data_tests:
@@ -41,7 +45,13 @@ models:
           - not_null
 
   - name: financial_overview_ttm_fact
-    description: # TODO
+    description: >
+      "Trailing twelve month fact table for the financial overview charts. 
+      Each value sums the latest four fiscal quarters, and EPS is an approximation."
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [ticker, label, period]
     columns:
       - name: ticker
         description: "Stock ticker symbol."
@@ -64,7 +74,7 @@ models:
           - not_null
           - dbt_utils.expression_is_true:
               arguments:
-                expression: "RLIKE '^[0-4]{1}$'"
+                expression: "RLIKE '^[1-4]{1}$'"
       - name: year
         description: "Extracted year from the period column."
         data_tests:
@@ -82,7 +92,13 @@ models:
           - not_null
 
   - name: financial_overview_yearly_fact
-    description: # TODO
+    description: >
+      "Annual fact table for the financial overview charts.
+      One row per metric per ticker per fiscal year, from reported annual figures."
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [ticker, label, period]
     columns:
       - name: ticker
         description: "Stock ticker symbol."

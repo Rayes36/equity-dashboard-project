@@ -42,7 +42,7 @@ decimal_num_inst AS(
     section,
     period,
     year,
-    CAST(value AS FLOAT) AS value,
+    CAST(value AS DOUBLE) AS value,
     data_updated_at
   FROM
     income_statement

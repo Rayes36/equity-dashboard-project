@@ -50,7 +50,7 @@ models:
           - not_null
           - dbt_utils.expression_is_true:
               arguments:
-                expression: "RLIKE '^[0-4]{1}$'"
+                expression: "RLIKE '^[1-4]{1}$'"
       - name: year
         description: "Extracted year from the period column."
         data_tests:
@@ -180,7 +180,7 @@ models:
           - not_null
           - dbt_utils.expression_is_true:
               arguments:
-                expression: "RLIKE '^[0-4]{1}$'"
+                expression: "RLIKE '^[1-4]{1}$'"
       - name: year
         description: "Extracted year from the period column."
         data_tests:
