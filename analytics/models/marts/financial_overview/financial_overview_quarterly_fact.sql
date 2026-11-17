@@ -4,22 +4,21 @@ WITH quarterly_fact AS(
   FROM {{ ref('int_financial_overview__quarterly') }}
 ),
 
-ttm_fact AS(
-  SELECT
-    *
-  FROM {{ ref('int_financial_overview__ttm') }}
-),
-
 remove_extras AS(
   SELECT
-    qf.*
-  FROM
-    quarterly_fact AS qf
-  INNER JOIN (
-    SELECT DISTINCT period
-    FROM ttm_fact
-  ) AS tf
-    ON qf.period = tf.period
+    * EXCEPT(quarter_rank)
+  FROM(
+    SELECT
+      *,
+      DENSE_RANK() OVER(
+        PARTITION BY ticker
+        ORDER BY year, quarter
+      ) AS quarter_rank
+    FROM
+      quarterly_fact
+  )
+  WHERE
+    quarter_rank > 3
 )
 
 SELECT * FROM remove_extras
