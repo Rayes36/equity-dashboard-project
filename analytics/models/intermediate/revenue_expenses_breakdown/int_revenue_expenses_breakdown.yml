@@ -1,7 +1,9 @@
 models:
   - name: int_revenue_expenses_breakdown__quarterly
     description: >
-      TODO
+      "Quarterly revenue and expense breakdown per ticker: revenue, cost of revenue, gross profit,
+      net income, operating expenses, SG&A, R&D, and other expenses.
+      One row per line item per fiscal quarter."
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
@@ -47,7 +49,8 @@ models:
 
   - name: int_revenue_expenses_breakdown__ttm
     description: >
-      TODO
+      "Trailing twelve month revenue and expense breakdown per ticker, summed over the latest
+      four consecutive fiscal quarters for each line item."
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:

@@ -5,30 +5,12 @@ WITH income_statement AS(
     {{ ref('stg_financial__income_statements_quarterly') }}
 ),
 
+-- For buckets built with mode='priority', the order of labels is the priority: the first label found wins.
 revenue_labels AS(
-  SELECT
-    ticker,
-    'Revenue' AS label,
-    period,
-    quarter,
-    year,
-    SUM(CAST(value AS BIGINT)) AS value,
-    MAX(data_updated_at) AS data_updated_at
-  FROM
-    income_statement
-  WHERE
-    label IN(
-      {%- for label in var('int__revenue_expenses')['revenue_labels'] %}
-      '{{ label }}'{% if not loop.last %},{% endif %}
-      {%- endfor %}
-    )
-  GROUP BY
-    ticker,
-    period,
-    quarter,
-    year
+  {{ label_bucket('income_statement', var('int__revenue_expenses')['revenue_labels'], 'Revenue', mode='priority') }}
 ),
 
+-- parts that are summed are left as full CTE's for readability
 cost_of_revenue_labels AS(
   SELECT
     ticker,
@@ -54,51 +36,11 @@ cost_of_revenue_labels AS(
 ),
 
 gross_profit_labels AS(
-  SELECT
-    ticker,
-    'Gross Profit' AS label,
-    period,
-    quarter,
-    year,
-    SUM(CAST(value AS BIGINT)) AS value,
-    MAX(data_updated_at) AS data_updated_at
-  FROM
-    income_statement
-  WHERE
-    label IN(
-      {%- for label in var('int__revenue_expenses')['gross_profit_labels'] %}
-      '{{ label }}'{% if not loop.last %},{% endif %}
-      {%- endfor %}
-    )
-  GROUP BY
-    ticker,
-    period,
-    quarter,
-    year
+  {{ label_bucket('income_statement', var('int__revenue_expenses')['gross_profit_labels'], 'Gross Profit', mode='priority') }}
 ),
 
 net_income_labels AS(
-  SELECT
-    ticker,
-    'Net Income' AS label,
-    period,
-    quarter,
-    year,
-    SUM(CAST(value AS BIGINT)) AS value,
-    MAX(data_updated_at) AS data_updated_at
-  FROM
-    income_statement
-  WHERE
-    label IN(
-      {%- for label in var('int__revenue_expenses')['net_income_labels'] %}
-      '{{ label }}'{% if not loop.last %},{% endif %}
-      {%- endfor %}
-    )
-  GROUP BY
-    ticker,
-    period,
-    quarter,
-    year
+  {{ label_bucket('income_statement', var('int__revenue_expenses')['net_income_labels'], 'Net Income', mode='priority') }}
 ),
 
 operating_expenses_labels AS(
@@ -126,27 +68,7 @@ operating_expenses_labels AS(
 ),
 
 sgna_labels AS(
-  SELECT
-    ticker,
-    'SG&A' AS label,
-    period,
-    quarter,
-    year,
-    SUM(CAST(value AS BIGINT)) AS value,
-    MAX(data_updated_at) AS data_updated_at
-  FROM
-    income_statement
-  WHERE
-    label IN(
-      {%- for label in var('int__revenue_expenses')['sgna_labels'] %}
-      '{{ label }}'{% if not loop.last %},{% endif %}
-      {%- endfor %}
-    )
-  GROUP BY
-    ticker,
-    period,
-    quarter,
-    year
+  {{ label_bucket('income_statement', var('int__revenue_expenses')['sgna_labels'], 'SG&A', mode='priority') }}
 ),
 
 rnd_labels AS(

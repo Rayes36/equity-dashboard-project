@@ -12,13 +12,10 @@ cash_flow AS(
     {{ ref('stg_financial__cash_flows_quarterly') }}
 ),
 
-whole_num_inst AS(
+revenue_labels AS(
   SELECT
     ticker,
-    label,
-    depth,
-    is_total,
-    section,
+    'Revenue' AS label,
     period,
     quarter,
     year,
@@ -28,39 +25,65 @@ whole_num_inst AS(
     income_statement
   WHERE
     label IN(
-      {%- for label in var('int__financial_overview')['whole_number_is'] %}
-      '{{ label }}'{% if not loop.last %},{% endif %}
-      {%- endfor %}
+      '{{ var('int__financial_overview')['revenue_labels'] }}'
     )
 ),
 
-decimal_num_inst AS(
+operating_income_labels AS(
   SELECT
     ticker,
-    label,
-    depth,
-    is_total,
-    section,
+    'Operating Income' AS label,
     period,
     quarter,
     year,
-    CAST(value AS DOUBLE) AS value,
+    CAST(value AS BIGINT) AS value,
     data_updated_at
   FROM
     income_statement
   WHERE
     label IN(
-      '{{ var('int__financial_overview')['decimal_number_is'] }}'
+      '{{ var('int__financial_overview')['operating_income_labels'] }}'
     )
 ),
 
-operating_cf AS(
+net_income_labels AS(
   SELECT
     ticker,
-    label,
-    depth,
-    is_total,
-    section,
+    'Net Income' AS label,
+    period,
+    quarter,
+    year,
+    CAST(value AS BIGINT) AS value,
+    data_updated_at
+  FROM
+    income_statement
+  WHERE
+    label IN(
+      '{{ var('int__financial_overview')['net_income_labels'] }}'
+    )
+),
+
+eps_labels AS(
+  SELECT
+    ticker,
+    'EPS' AS label,
+    period,
+    quarter,
+    year,
+    ROUND(CAST(value AS DOUBLE), 2) AS value,
+    data_updated_at
+  FROM
+    income_statement
+  WHERE
+    label IN(
+      '{{ var('int__financial_overview')['eps_labels'] }}'
+    )
+),
+
+operating_cash_flow_labels AS(
+  SELECT
+    ticker,
+    'Operating Cash Flow' AS label,
     period,
     quarter,
     year,
@@ -70,101 +93,66 @@ operating_cf AS(
     cash_flow
   WHERE
     label IN(
-      '{{ var('int__financial_overview')['ocf'] }}'
+      '{{ var('int__financial_overview')['operating_cash_flow_labels'] }}'
     )
 ),
 
-ppe AS(
-  SELECT
-    ticker,
-    'ppe' AS label,
-    period,
-    quarter,
-    year,
-    SUM(CAST(value AS BIGINT)) AS value,
-    MAX(data_updated_at) AS data_updated_at
-  FROM
-    income_statement
-  WHERE
-    label IN(
-      {%- for label in var('int__financial_overview')['ppe'] %}
-      '{{ label }}'{% if not loop.last %},{% endif %}
-      {%- endfor %}
-    )
-  GROUP BY
-    ticker,
-    period,
-    quarter,
-    year
+property_plant_equipment_labels AS(
+  {{ label_bucket('cash_flow', var('int__financial_overview')['property_plant_equipment_labels'], 'Property Plant and Equipment', mode='priority') }}
 ),
 
 -- fcf Calculation --------------------------------------------------------------
-free_cash_flow AS(
+free_cash_flow_labels AS(
   SELECT
       ocf.ticker,
       'Free Cash Flow' AS label,
-      ocf.depth,
-      ocf.is_total,
-      ocf.section,
       ocf.period,
       ocf.quarter,
       ocf.year,
       ocf.value - ppe.value AS value,
       GREATEST(ocf.data_updated_at, ppe.data_updated_at) AS data_updated_at
     FROM
-      operating_cf AS ocf
-    INNER JOIN ppe
+      operating_cash_flow_labels AS ocf
+    INNER JOIN property_plant_equipment_labels AS ppe
       ON ppe.ticker = ocf.ticker
     AND ppe.period = ocf.period
 ),
 
 combined AS(
   SELECT
-    ticker,
-    label,
-    period,
-    quarter,
-    year,
-    value,
-    data_updated_at
+    *
   FROM
-    whole_num_inst
-    
-  UNION ALL
-  SELECT
-    ticker,
-    label,
-    period,
-    quarter,
-    year,
-    ROUND(value, 2) AS value,
-    data_updated_at
-  FROM
-    decimal_num_inst
+    revenue_labels
 
   UNION ALL
   SELECT
-    ticker,
-    label,
-    period,
-    quarter,
-    year,
-    value,
-    data_updated_at
+    *
   FROM
-    operating_cf
+    operating_income_labels
 
   UNION ALL
   SELECT
-    ticker,
-    label,
-    period,
-    quarter,
-    year,
-    value,
-    data_updated_at
+    *
   FROM
-    free_cash_flow
+    net_income_labels
+  
+  UNION ALL
+  SELECT
+    *
+  FROM
+    eps_labels
+  
+  UNION ALL
+  SELECT
+    *
+  FROM
+    operating_cash_flow_labels
+  
+  UNION ALL
+  SELECT
+    *
+  FROM
+    free_cash_flow_labels
 )
 
 SELECT * FROM combined

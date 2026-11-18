@@ -1,56 +1,58 @@
 vars:
   int__financial_overview:
     # from income statement
-    whole_number_is:
-      - Total Revenue
-      - Operating Income (Loss)
-      - Net Income (Loss) Attributable to Parent
-    decimal_number_is: Earnings Per Share, Diluted
+    revenue_labels: Total Revenue
+    operating_income_labels: Operating Income (Loss)
+    net_income_labels: Net Income (Loss) Attributable to Parent
+    eps_labels: Earnings Per Share, Diluted
     # from cash flow
-    ocf: Net Cash Provided by (Used in) Operating Activities
-    ppe: 
+    operating_cash_flow_labels: Net Cash Provided by (Used in) Operating Activities
+    property_plant_equipment_labels: # PRIORITY
       - Payments to Acquire Property, Plant, and Equipment
       - Payments to Acquire Productive Assets 
       - Payments to Acquire and Develop Real Estate
       - Payments to Acquire Commercial Real Estate
+      - Payments to Acquire Equipment on Lease
+      - Finance Lease, Principal Payments
 
 
   int__revenue_expenses:
-    revenue_labels:
+    revenue_labels: # PRIORITY
       - Total Revenue
       - Revenue from Contract with Customer, Including Assessed Tax
-    cost_of_revenue_labels:
+    cost_of_revenue_labels: # SUM
       - Cost of Revenue
       - Other Cost of Operating Revenue
       - Direct Costs of Leased and Rented Property or Equipment
       - Cost, Depreciation and Amortization
-    gross_profit_labels:
+    gross_profit_labels: # PRIORITY
       - Gross Profit
       - Gross Profit (Calculated)
 
-    net_income_labels:
+    net_income_labels: # PRIORITY
       - Net Income (Loss) Attributable to Parent
       - Net Income (Loss), Including Portion Attributable to Noncontrolling Interest
       - Net Income (Loss), Including Portion Attributable to NCI
+      - Net Income (Loss) Available to Common Stockholders, Basic
     operating_expenses_labels:
-    # SG&A
-      - Selling, General and Administrative Expense
+    # SG&A # PRIORITY
       - General and Administrative Expense
       - Selling and Marketing
-    # R&D
+      - Selling, General and Administrative Expense
+    # R&D # SUM
       - Research and Development Expense
-    # other
+    # other # SUM
       - Other Expenses
       - Selling and Marketing Expense
       - Amortization of Intangible Assets
 
-    sgna_labels:
-      - Selling, General and Administrative Expense
+    sgna_labels: # PRIORITY
       - General and Administrative Expense
       - Selling and Marketing
-    rnd_labels:
+      - Selling, General and Administrative Expense
+    rnd_labels: # SUM
       - Research and Development Expense
-    other_labels:
+    other_labels: # SUM
       - Other Expenses
       - Selling and Marketing Expense
       - Amortization of Intangible Assets
