@@ -28,9 +28,9 @@ whole_num_inst AS(
     income_statement
   WHERE
     label IN(
-      'Total Revenue',
-      'Operating Income (Loss)',
-      'Net Income (Loss) Attributable to Parent'
+      {%- for label in var('int__financial_overview')['whole_number_is'] %}
+      '{{ label }}'{% if not loop.last %},{% endif %}
+      {%- endfor %}
     )
 ),
 
@@ -50,7 +50,7 @@ decimal_num_inst AS(
     income_statement
   WHERE
     label IN(
-      'Earnings Per Share, Diluted'
+      '{{ var('int__financial_overview')['decimal_number_is'] }}'
     )
 ),
 
@@ -70,28 +70,32 @@ operating_cf AS(
     cash_flow
   WHERE
     label IN(
-      'Net Cash Provided by (Used in) Operating Activities'
+      '{{ var('int__financial_overview')['ocf'] }}'
     )
 ),
 
 ppe AS(
   SELECT
     ticker,
-    label,
-    depth,
-    is_total,
-    section,
+    'ppe' AS label,
     period,
     quarter,
     year,
-    CAST(value AS BIGINT) AS value,
-    data_updated_at
+    SUM(CAST(value AS BIGINT)) AS value,
+    MAX(data_updated_at) AS data_updated_at
   FROM
-    cash_flow
+    income_statement
   WHERE
     label IN(
-      'Payments to Acquire Property, Plant, and Equipment'
+      {%- for label in var('int__financial_overview')['ppe'] %}
+      '{{ label }}'{% if not loop.last %},{% endif %}
+      {%- endfor %}
     )
+  GROUP BY
+    ticker,
+    period,
+    quarter,
+    year
 ),
 
 -- fcf Calculation --------------------------------------------------------------

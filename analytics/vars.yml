@@ -1,0 +1,56 @@
+vars:
+  int__financial_overview:
+    # from income statement
+    whole_number_is:
+      - Total Revenue
+      - Operating Income (Loss)
+      - Net Income (Loss) Attributable to Parent
+    decimal_number_is: Earnings Per Share, Diluted
+    # from cash flow
+    ocf: Net Cash Provided by (Used in) Operating Activities
+    ppe: 
+      - Payments to Acquire Property, Plant, and Equipment
+      - Payments to Acquire Productive Assets 
+      - Payments to Acquire and Develop Real Estate
+      - Payments to Acquire Commercial Real Estate
+
+
+  int__revenue_expenses:
+    revenue_labels:
+      - Total Revenue
+      - Revenue from Contract with Customer, Including Assessed Tax
+    cost_of_revenue_labels:
+      - Cost of Revenue
+      - Other Cost of Operating Revenue
+      - Direct Costs of Leased and Rented Property or Equipment
+      - Cost, Depreciation and Amortization
+    gross_profit_labels:
+      - Gross Profit
+      - Gross Profit (Calculated)
+
+    net_income_labels:
+      - Net Income (Loss) Attributable to Parent
+      - Net Income (Loss), Including Portion Attributable to Noncontrolling Interest
+      - Net Income (Loss), Including Portion Attributable to NCI
+    operating_expenses_labels:
+    # SG&A
+      - Selling, General and Administrative Expense
+      - General and Administrative Expense
+      - Selling and Marketing
+    # R&D
+      - Research and Development Expense
+    # other
+      - Other Expenses
+      - Selling and Marketing Expense
+      - Amortization of Intangible Assets
+
+    sgna_labels:
+      - Selling, General and Administrative Expense
+      - General and Administrative Expense
+      - Selling and Marketing
+    rnd_labels:
+      - Research and Development Expense
+    other_labels:
+      - Other Expenses
+      - Selling and Marketing Expense
+      - Amortization of Intangible Assets

@@ -5,19 +5,6 @@ WITH quarterly AS(
     {{ ref('int_financial_overview__quarterly') }}
 ),
 
-extract_quarter_and_year AS(
-  SELECT
-    ticker,
-    label,
-    period,
-    quarter,
-    year,
-    value,
-    data_updated_at
-  FROM
-    quarterly
-),
-
 calculation AS(
   SELECT
     ticker,
@@ -43,7 +30,7 @@ calculation AS(
     END AS value,
     data_updated_at
   FROM
-    extract_quarter_and_year
+    quarterly
 )
 
 SELECT * FROM calculation WHERE value IS NOT NULL
