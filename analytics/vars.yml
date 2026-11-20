@@ -1,4 +1,5 @@
 vars:
+# Financial overview ----------------------------------------------------------------------------
   int__financial_overview:
     # from income statement
     revenue_labels: Total Revenue
@@ -16,6 +17,7 @@ vars:
       - Finance Lease, Principal Payments
 
 
+# Revenue expenses breakdown --------------------------------------------------------------------
   int__revenue_expenses:
     revenue_labels: # PRIORITY
       - Total Revenue
@@ -56,3 +58,52 @@ vars:
       - Other Expenses
       - Selling and Marketing Expense
       - Amortization of Intangible Assets
+
+
+# Balance sheet decomposition ----------------------------------------------------------------------
+  int_balance_sheet_decomposition_assets:
+    # Current assets
+    cash_short_term_investments_labels__assets: # SUM
+      - Cash and Cash Equivalents, at Carrying Value
+      - Short-term Investments
+    receivables_labels__assets: # PRIORITY
+      - Accounts Receivable, after Allowance for Credit Loss, Current
+      - Accounts Receivable, after Allowance for Credit Loss
+    other_current_assets_labels__assets: # SUM
+      - Inventory, Net
+      - Prepaid Expense and Other Assets, Current
+    current_assets_labels__assets_parent: Assets, Current
+    # Non current assets
+    ppe_labels__assets: Property, Plant and Equipment, Net
+    intangibles_labels__assets: # SUM
+      - Goodwill
+      - Intangible Assets, Net (Excluding Goodwill)
+    other_non_current_assets_labels__assets: Other Assets, Noncurrent
+    # non_current_assets_labels__assets_parent: DERIVED (Assets - Assets, Current)
+
+  int_balance_sheet_decomposition_liabilities:
+    # Current liabilities
+    accounts_payable_labels__liabilities: Accounts Payable, Current
+    accrued_liabilities_labels__liabilities: Accrued Liabilities, Current
+    other_current_liabilities_labels__liabilities: # HYBRID - PRIORITY within each group, then SUM the groups
+      # debt variants: first present wins (same concept, 4 spellings)
+      - - Short-term Debt
+        - Debt, Current
+        - Long-term Debt, Current Maturities
+        - Long-term Debt and Lease Obligation, Current
+      # additive component
+      - - Operating Lease, Liability, Current
+      # dividend variants: first present wins
+      - - Dividends Payable, Current
+        - Dividends Payable
+    total_current_liabilities_labels__liabilities_parent: Liabilities, Current
+    # Non current liabilities
+    long_term_debt_labels__liabilities: # PRIORITY
+      - Long-term Debt, Excluding Current Maturities
+      - Long Term Debt
+    long_term_operating_lease_liabilities_labels__liabilities: Operating Lease, Liability, Noncurrent
+    other_long_term_liabilities_labels__liabilities: Other Liabilities, Noncurrent
+    deferred_tax_liabilities_labels__liabilities: # PRIORITY
+      - Deferred Tax Liabilities, Net
+      - Deferred Income Tax Liabilities, Net
+    # total_non_current_liabilities_labels__liabilities_parent: DERIVED (Liabilities - Liabilities, Current)
